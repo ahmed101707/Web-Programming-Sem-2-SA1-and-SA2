@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Holidae Travel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root{
+--primary:#0a3d62;
+--accent:#00a8ff;
+--bg:#f4f6fb;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
+}
+
+body{
+background:var(--bg);
+overflow-x:hidden;
+}
+
+/* NAVBAR */
+.navbar{
+background:rgba(10,61,98,0.95);
+color:white;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px 20px;
+position:sticky;
+top:0;
+z-index:100;
+}
+
+.navbar .links button{
+margin:0 5px;
+padding:8px 12px;
+border:none;
+background:transparent;
+color:white;
+cursor:pointer;
+transition:0.3s;
+}
+
+.navbar .links button:hover{
+background:white;
+color:var(--primary);
+}
+
+/* HERO SLIDER */
+.hero{
+height:90vh;
+position:relative;
+overflow:hidden;
+}
+
+.slide{
+position:absolute;
+width:100%;
+height:100%;
+background-size:cover;
+background-position:center;
+opacity:0;
+transition:opacity 1s ease-in-out;
+}
+
+.slide.active{
+opacity:1;
+}
+
+.hero h1{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+color:white;
+font-size:3rem;
+text-align:center;
+z-index:2;
+animation:fadeUp 1.5s ease;
+}
+
+.hero::after{
+content:"";
+position:absolute;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.4);
+}
+
+/* ANIMATIONS */
+@keyframes fadeUp{
+from{opacity:0; transform:translate(-50%,-30%);}
+to{opacity:1; transform:translate(-50%,-50%);}
+}
+
+.fade-in{
+animation:fadeIn 1s ease forwards;
+}
+
+@keyframes fadeIn{
+from{opacity:0;}
+to{opacity:1;}
+}
+
+/* SECTION */
+.section{
+padding:40px 20px;
+}
+
+/* GRID */
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:15px;
+}
+
+.card{
+background:white;
+border-radius:10px;
+overflow:hidden;
+cursor:pointer;
+box-shadow:0 5px 20px rgba(0,0,0,0.1);
+transition:0.3s;
+animation:fadeIn 1s ease;
+}
+
+.card:hover{
+transform:translateY(-8px) scale(1.03);
+}
+
+.card img{
+width:100%;
+height:160px;
+object-fit:cover;
+}
+
+.card h3{
+padding:10px;
+}
+
+/* PAGE */
+.page{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:white;
+overflow:auto;
+padding:20px;
+z-index:999;
+animation:fadeIn 0.5s ease;
+}
+
+.page.active{
+display:block;
+}
+
+/* HOTEL */
+.hotel{
+border:1px solid #ddd;
+padding:12px;
+margin:10px 0;
+border-radius:10px;
+cursor:pointer;
+transition:0.3s;
+}
+
+.hotel:hover{
+border-color:var(--accent);
+transform:scale(1.02);
+}
+
+/* BOX */
+.box{
+background:#f0f2f5;
+padding:15px;
+margin-top:10px;
+border-radius:10px;
+}
+
+/* INPUT */
+input,select{
+width:100%;
+padding:10px;
+margin:8px 0;
+}
+
+/* BUTTON */
+button{
+padding:8px 12px;
+border:none;
+cursor:pointer;
+border-radius:5px;
+background:var(--primary);
+color:white;
+transition:0.3s;
+}
+
+button:hover{
+background:var(--accent);
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+<div><b>Holidae</b></div>
+<div class="links">
+<button onclick="home()">Home</button>
+<button onclick="scrollToSection('dest')">Destinations</button>
+<button onclick="scrollToSection('about')">About</button>
+<button onclick="openLogin()">Login</button>
+<button onclick="openSignup()">Signup</button>
+</div>
+</div>
+
+<!-- HERO SLIDER -->
+<div class="hero">
+<div class="slide active" style="background-image:url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee')"></div>
+<div class="slide" style="background-image:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e')"></div>
+<div class="slide" style="background-image:url('https://images.unsplash.com/photo-1491553895911-0055eca6402d')"></div>
+
+<h1>Explore The World In Style</h1>
+</div>
+
+<!-- DEST -->
+<div class="section" id="dest">
+<h2 style="text-align:center;">Top Destinations</h2>
+<div class="grid" id="home"></div>
+</div>
+
+<!-- ABOUT -->
+<div class="section" id="about">
+<h2 style="text-align:center;">About</h2>
+<p style="text-align:center;">Modern travel booking made simple.</p>
+</div>
+
+<!-- CITY PAGE -->
+<div class="page" id="cityPage">
+<button onclick="home()">← Back</button>
+
+<h2 id="cityName"></h2>
+<img id="cityImg" style="width:100%;max-height:250px;object-fit:cover">
+
+<h3>Hotels</h3>
+<div id="hotels"></div>
+
+<h3>Flight</h3>
+<select id="flightType" onchange="updateTotal()">
+<option value="direct">Direct (+$200)</option>
+<option value="connected">Connected (+$100)</option>
+</select>
+
+<div class="box">
+Total: $<span id="total"></span>
+</div>
+
+<button onclick="goCheckout()">Continue</button>
+</div>
+
+<!-- CHECKOUT -->
+<div class="page" id="checkout">
+<button onclick="backCity()">← Back</button>
+
+<h2>Checkout</h2>
+
+<div class="box">
+<p>City: <span id="cCity"></span></p>
+<p>Hotel: <span id="cHotel"></span></p>
+<p>Flight: <span id="cFlight"></span></p>
+<p>Total: $<span id="cTotal"></span></p>
+</div>
+
+<input placeholder="Card Number">
+<input placeholder="Name">
+<input placeholder="CVV">
+
+<button onclick="alert('Booked! 🎉')">Pay</button>
+</div>
+
+<!-- LOGIN -->
+<div class="page" id="login">
+<button onclick="home()">← Home</button>
+<h2>Login</h2>
+<input placeholder="Email">
+<input placeholder="Password">
+<button>Login</button>
+</div>
+
+<!-- SIGNUP -->
+<div class="page" id="signup">
+<button onclick="home()">← Home</button>
+<h2>Signup</h2>
+<input placeholder="Name">
+<input placeholder="Email">
+<input placeholder="Password">
+<button>Signup</button>
+</div>
+
+<script>
+
+/* HERO SLIDER */
+let slides=document.querySelectorAll('.slide');
+let index=0;
+
+setInterval(()=>{
+slides[index].classList.remove('active');
+index=(index+1)%slides.length;
+slides[index].classList.add('active');
+},4000);
+
+/* DATA */
+let data=[
+{name:"Paris",img:"https://images.unsplash.com/photo-1502602898657-3e91760cbb34",base:1200,hotels:[{n:"Luxury Paris",p:500},{n:"Budget Inn",p:300}]},
+{name:"Dubai",img:"https://images.unsplash.com/photo-1512453979798-5ea266f8880c",base:1400,hotels:[{n:"Burj Hotel",p:600},{n:"Desert Stay",p:400}]},
+{name:"Tokyo",img:"https://images.unsplash.com/photo-1542051841857-5f90071e7989",base:1300,hotels:[{n:"Shibuya Grand",p:550},{n:"Tokyo Inn",p:350}]},
+{name:"New York",img:"https://images.unsplash.com/photo-1495020689067-958852a7765e",base:1500,hotels:[{n:"Manhattan Lux",p:650},{n:"NY Budget",p:400}]},
+{name:"London",img:"https://images.unsplash.com/photo-1486299267070-83823f5448dd",base:1250,hotels:[{n:"Royal London",p:520},{n:"River Stay",p:380}]}
+];
+
+let selected=null,hotel=null;
+
+/* HOME */
+function home(){
+closeAll();
+let h=document.getElementById("home");
+h.innerHTML="";
+data.forEach((d,i)=>{
+h.innerHTML+=`
+<div class="card" onclick="openCity(${i})">
+<img src="${d.img}">
+<h3>${d.name}</h3>
+</div>`;
+});
+}
+
+/* CITY */
+function openCity(i){
+selected=data[i];
+closeAll();
+document.getElementById("cityPage").classList.add("active");
+
+document.getElementById("cityName").innerText=selected.name;
+document.getElementById("cityImg").src=selected.img;
+
+let h=document.getElementById("hotels");
+h.innerHTML="";
+
+selected.hotels.forEach((x,idx)=>{
+h.innerHTML+=`<div class="hotel" onclick="pick(${idx})">${x.n} - $${x.p}</div>`;
+});
+
+updateTotal();
+}
+
+function pick(i){
+hotel=selected.hotels[i];
+updateTotal();
+}
+
+function updateTotal(){
+if(!hotel)return;
+let flight=document.getElementById("flightType").value;
+let price=selected.base+hotel.p+(flight==="direct"?200:100);
+document.getElementById("total").innerText=price;
+}
+
+function goCheckout(){
+document.getElementById("cityPage").classList.remove("active");
+document.getElementById("checkout").classList.add("active");
+
+document.getElementById("cCity").innerText=selected.name;
+document.getElementById("cHotel").innerText=hotel.n;
+document.getElementById("cFlight").innerText=document.getElementById("flightType").value;
+document.getElementById("cTotal").innerText=document.getElementById("total").innerText;
+}
+
+function backCity(){
+document.getElementById("checkout").classList.remove("active");
+document.getElementById("cityPage").classList.add("active");
+}
+
+function openLogin(){closeAll();document.getElementById("login").classList.add("active");}
+function openSignup(){closeAll();document.getElementById("signup").classList.add("active");}
+
+function closeAll(){
+document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+}
+
+function scrollToSection(id){
+document.getElementById(id).scrollIntoView({behavior:'smooth'});
+}
+
+home();
+
+</script>
+
+</body>
+</html>
